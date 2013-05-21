@@ -1,47 +1,24 @@
-=head1 ClearCase.pm
+=head1 NAME
 
-Object orientated interface to ClearCase.
+ClearCase - Object orientated interface to ClearCase.
 
-=head1 Overview
+=head1 SYNOPSIS
+
+use ClearCase;
+
+my $cc = new ClearCase;
+
+print "Views not modified for a week:\n";
+print map { $_->owner, ' ', $_->name, "\n" } grep { (time - $_->mtime) > 7*24*60*60 } $cc->views
+
+print "List of vobs in current region:\n";
+print map { $_->name } $cc->vobs;
+
+=head1 DESCRIPTION
 
 This module tries to provide an Object Orientated interface to ClearCase, in particular targetted
 to make it easier to write triggers and hooks.  Unfortunately, ClearCase is huge and life is short,
-so there are some parts that are not covered (though they may be in future versions):
-
-=over
-
-=item
-
-any administrative functionality e.g. checkvob
-
-=item
-
-any graphical interfaces, including CCRC
-
-=item
-
-snapshot views
-
-=item
-
-any functionality that is never used by end-users, e.g. element type management
-
-=item
-
-functionality that produces mostly textual output instead of object information, e.g. annotate or diff
-
-=item
-
-anything with a complicated interface that would be easier to call directly with ct()
-
-=item
-
-Most Windows functionality
-
-=item
-
-merge arrows are handled as hlinks, which is what they really are, so there is no support for e.g. rmmerge
-=back
+so there are some parts that are not covered - see the LIMITATIONS section below.
 
 Everything is done through a ClearCase object, which you will get like this...
 
@@ -93,7 +70,7 @@ going to use this module.
 
 There are some general principles covering most or all of the external interfaces of the classes.
 
-Accessors are simple methods.  To find the name of something, use the method name():
+Accessors are simple methods, e.g. to find the name of something, use the method name():
 
    print "Current view name is ",$cc->cwv->name,"\n";
 
@@ -126,9 +103,11 @@ stdout and stderr instead of letting them print out, use this:
 
 The hash can be anywhere in the argument list, but by convention it should be first.  By default, stdout and stderr are left alone, i.e. they go to stdout and stderr, and the status is returned.
 
-The environment variable CLEARCASE_MODULE_VERBOSE can be set - this will print out cleartool commands and the exit status.
+The environment variable CLEARCASE_MODULE_VERBOSE can be set - this will print out every command
+passed to cleartool and its exit status.
 
-The environment variable CLEARCASE_MODULE_DEBUG can also be set - this will print out the same as CLEARCASE_MODULE_VERBOSE, plus any stdout or stderr that is being captured.
+The environment variable CLEARCASE_MODULE_DEBUG can also be set - this will print out the same as
+CLEARCASE_MODULE_VERBOSE, plus any stdout or stderr that is being captured.
 
 Filesystem or view objects are represented by ClearCase::Path objects.  A ClearCase::Path object really just contains
 a path, possibly a view-extended path, which can reference (among other things):
@@ -142,13 +121,56 @@ a path, possibly a view-extended path, which can reference (among other things):
 A ClearCase::Path doesn't have many methods and is not very useful; use the object() method to convert it into
 a ClearCase::Version, ClearCase::Branch or ClearCase::Element as appropriate.  Be warned that the ClearCase::Path can become invalid if changes are made to the view - for example if the config spec is changed, or directories are updated.
 
-=head1 Caveats
+=head1 DEPENDENCIES
+
+This module uses Memoize, which became a part of the standard distribution in Perl 5.8.  Apart from that,
+it should work with any sensible version of Perl 5.
+
+=head1 CAVEATS
+
+=over
+
+There is a lot of ClearCase functionality that is not supported by this module and probably will
+not be in future versions either:
 
 =over
 
 =item
 
-rename() does not update hashes and other data structures.  It probably should, but
+any administrative functionality e.g. checkvob
+
+=item
+
+any graphical interfaces, including CCRC
+
+=item
+
+snapshot views
+
+=item
+
+any functionality that is never used by end-users, e.g. element type management
+
+=item
+
+functionality that produces mostly textual output instead of object information, e.g. annotate or diff
+
+=item
+
+anything with a complicated interface that would be easier to call directly with ct()
+
+=item
+
+Most Windows functionality
+
+=item
+
+merge arrows are handled as hlinks, which is what they really are, so there is no support for e.g. rmmerge
+=back
+
+=item
+
+rename() does not update hashes and other internal data structures.  It probably should, but
 it is only used rarely and it would be a lot of code spread across a lot of the module
 to properly maintain.  Instead, simply create a new ClearCase object after using rename().
 
@@ -173,6 +195,8 @@ to the view or activity.  You can get a ClearCase::Checkout through a view too, 
 checkout does belong to the view.  Checkouts can only be done for the current
 working view, though if a file is already checked out in another view you can
 get the ClearCase::Checkout object for it.
+
+=back
 
 =back
 
@@ -211,7 +235,7 @@ Baseline management, including rmbl
 
 =back
 
-=head1 Future enhancements
+=head1 FUTURE ENHANCEMENTS
 
 =over
 
@@ -255,9 +279,10 @@ UCM baseline support should be a lot better
  rmbranch
  rmver
  space
+
 =back
 
-=head1 Missing functionality
+=head1 MISSING FUNCTIONALITY
 
  anything to do with replicas
  catcr -select
@@ -363,7 +388,7 @@ UCM baseline support should be a lot better
  xcleardiff
  xmldiffmrg
 
-=head1 Classes
+=head1 CLASSES
 
 A few quick notes on method documentation: each method shows the arguments and return type.  An empty
 argument list is shown as ().
@@ -378,7 +403,9 @@ isa() method.
 use warnings;
 use strict;
 
-require 5.8;   # Needs Memoize
+require 5.008;   # Needs Memoize
+
+our $VERSION = "0.1";
 
 # Pre-declare all packages
 package ClearCase;
@@ -6304,3 +6331,17 @@ sub extraLsFlags { () }
 
 ###############################################################################
 
+=head1 AUTHOR
+
+Lezz Giles, E<lt>lezzgiles@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by Leslie Giles
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut
