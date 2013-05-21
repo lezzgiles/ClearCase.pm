@@ -1,0 +1,6 @@
+Revision history for Perl extension ClearCase.
+
+0.01  Fri May 17 13:41:14 2013
+	- original version; created by h2xs 1.23 with options
+		-X -n ClearCase
+

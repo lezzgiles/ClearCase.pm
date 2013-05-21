@@ -1,0 +1,32 @@
+ClearCase version 0.01
+======================
+
+This is an early version of an OO perl interface to ClearCase.  It handles
+types, views, vobs etc. well but does not yet handle versions, branches or
+elements well.  This is alpha software - any part of the interface may
+change at any time.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Memoize  (included in Perl 5.8)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Leslie Giles
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
